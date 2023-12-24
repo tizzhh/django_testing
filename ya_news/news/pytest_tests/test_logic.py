@@ -36,12 +36,14 @@ def test_user_cant_use_bad_words(admin_client, news_id):
     assert Comment.objects.count() == 0
 
 
-def test_author_can_delete_comment(author_client, comment_id, news_id):
+def test_author_can_delete_comment(author_client, comment_id, news_id, client):
     url = reverse('news:delete', args=comment_id)
     response = author_client.delete(url)
     news_url = reverse('news:detail', args=news_id)
     assertRedirects(response, f'{news_url}#comments')
     assert Comment.objects.count() == 0
+    # response_anon = client.delete(url)
+    # assert response_anon.status_code == HTTPStatus.NOT_FOUND
 
 
 def test_user_cant_delete_comment_of_another_user(admin_client, comment_id):
