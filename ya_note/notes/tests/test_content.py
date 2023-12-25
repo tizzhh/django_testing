@@ -1,8 +1,6 @@
 from django.contrib.auth import get_user_model
 
 from notes.forms import NoteForm
-# почему-то isort ставит класс правее константы, хотя
-# алфавит наруешается... Чего-то в гугле не смог найти на этот счет
 from notes.tests.basefixture import BaseTest, URLS
 
 User = get_user_model()
@@ -28,8 +26,10 @@ class TestHomePage(BaseTest):
         )
         for client, note_in_list in names:
             response = client.get(URLS['list_url'])
-            object_list = response.context['object_list']
-            self.assertIs(self.note in object_list, note_in_list)
+            self.assertIn('object_list', response.context)
+            self.assertIs(
+                self.note in response.context['object_list'], note_in_list
+            )
 
     def test_pages_contains_form(self):
         urls = (
@@ -38,5 +38,4 @@ class TestHomePage(BaseTest):
         )
         for url in urls:
             response = self.author_client.get(url)
-            self.assertIn('form', response.context)
-            self.assertIsInstance(response.context['form'], NoteForm)
+            self.assertIsInstance(response.context.get('form'), NoteForm)

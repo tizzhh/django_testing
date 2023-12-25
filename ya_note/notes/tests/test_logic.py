@@ -33,6 +33,12 @@ class TestNoteEditDelete(BaseTest):
             'slug': cls.NEW_NOTE_SLUG,
         }
 
+    def assert_expected_note_changes(self, note, expected_vals):
+        self.assertEqual(note.title, expected_vals['title'])
+        self.assertEqual(note.text, expected_vals['text'])
+        self.assertEqual(note.author, expected_vals['author'])
+        self.assertEqual(note.slug, expected_vals['slug'])
+
     def test_author_can_delete_note(self):
         expected_notes_count = Note.objects.count() - 1
         response = self.author_client.delete(self.delete_url)
@@ -53,10 +59,15 @@ class TestNoteEditDelete(BaseTest):
         )
         self.assertRedirects(response, self.after_create_redirect)
         self.note.refresh_from_db()
-        self.assertEqual(self.note.title, self.NEW_NOTE_TITLE)
-        self.assertEqual(self.note.text, self.NEW_NOTE_TEXT)
-        self.assertEqual(self.note.author, self.author)
-        self.assertEqual(self.note.slug, self.NEW_NOTE_SLUG)
+        self.assert_expected_note_changes(
+            self.note,
+            {
+                'title': self.NEW_NOTE_TITLE,
+                'text': self.NEW_NOTE_TEXT,
+                'author': self.author,
+                'slug': self.NEW_NOTE_SLUG,
+            },
+        )
 
     def test_non_author_cant_edit_note(self):
         response = self.reader_client.post(
@@ -64,10 +75,15 @@ class TestNoteEditDelete(BaseTest):
         )
         self.assertEqual(response.status_code, HTTPStatus.NOT_FOUND)
         self.note.refresh_from_db()
-        self.assertEqual(self.note.title, self.NOTE_TITLE)
-        self.assertEqual(self.note.text, self.NOTE_TEXT)
-        self.assertEqual(self.note.author, self.author)
-        self.assertEqual(self.note.slug, SLUG_ARG[0])
+        self.assert_expected_note_changes(
+            self.note,
+            {
+                'title': self.NOTE_TITLE,
+                'text': self.NOTE_TEXT,
+                'author': self.author,
+                'slug': SLUG_ARG[0],
+            },
+        )
 
     def test_anon_user_cant_create_note(self):
         expected_notes_count = Note.objects.count()
@@ -82,10 +98,15 @@ class TestNoteEditDelete(BaseTest):
         self.assertRedirects(response, self.after_create_redirect)
         self.assertEqual(Note.objects.count(), 1)
         note = Note.objects.get()
-        self.assertEqual(note.title, self.NOTE_TITLE)
-        self.assertEqual(note.text, self.NOTE_TEXT)
-        self.assertEqual(note.slug, SLUG_ARG[0])
-        self.assertEqual(note.author, self.author)
+        self.assert_expected_note_changes(
+            note,
+            {
+                'title': self.NOTE_TITLE,
+                'text': self.NOTE_TEXT,
+                'author': self.author,
+                'slug': SLUG_ARG[0],
+            },
+        )
 
     def test_slug_from_title(self):
         Note.objects.all().delete()
@@ -94,10 +115,15 @@ class TestNoteEditDelete(BaseTest):
         self.assertRedirects(response, self.after_create_redirect)
         self.assertEqual(Note.objects.count(), 1)
         note = Note.objects.get()
-        self.assertEqual(note.slug, slugify(self.NOTE_TITLE))
-        self.assertEqual(note.title, self.NOTE_TITLE)
-        self.assertEqual(note.text, self.NOTE_TEXT)
-        self.assertEqual(note.author, self.author)
+        self.assert_expected_note_changes(
+            note,
+            {
+                'title': self.NOTE_TITLE,
+                'text': self.NOTE_TEXT,
+                'author': self.author,
+                'slug': slugify(self.NOTE_TITLE),
+            },
+        )
 
     def test_not_unique_slug(self):
         expected_notes_count = Note.objects.count()

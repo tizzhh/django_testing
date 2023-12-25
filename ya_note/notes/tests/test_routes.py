@@ -10,8 +10,6 @@ User = get_user_model()
 class TestRoutes(BaseTest):
     def test_pages_availabiliy(self):
         urls_clients_statuses = (
-            # выглядит как-то криво, но что-то лучше придумать не вышло
-            # думал сделать через zip() и 3 списка, но все равно криво
             (URLS['home_url'], self.client, HTTPStatus.OK),
             (URLS['login_url'], self.client, HTTPStatus.OK),
             (URLS['logout_url'], self.client, HTTPStatus.OK),

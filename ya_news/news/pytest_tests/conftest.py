@@ -93,11 +93,6 @@ def detail_url(news):
 
 
 @pytest.fixture
-def detail_url_with_comments(news, comment_list):
-    return reverse('news:detail', args=(news.pk,))
-
-
-@pytest.fixture
 def delete_url(comment):
     return reverse('news:delete', args=(comment.pk,))
 
