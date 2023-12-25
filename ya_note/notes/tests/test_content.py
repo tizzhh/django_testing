@@ -1,7 +1,9 @@
 from django.contrib.auth import get_user_model
 
 from notes.forms import NoteForm
-from notes.tests.basefixture import URLS, BaseTest
+# почему-то isort ставит класс правее константы, хотя
+# алфавит наруешается... Чего-то в гугле не смог найти на этот счет
+from notes.tests.basefixture import BaseTest, URLS
 
 User = get_user_model()
 

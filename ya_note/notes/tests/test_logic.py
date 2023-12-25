@@ -5,7 +5,7 @@ from pytils.translit import slugify
 
 from notes.forms import WARNING
 from notes.models import Note
-from notes.tests.basefixture import SLUG_ARG, URLS, BaseTest
+from notes.tests.basefixture import BaseTest, SLUG_ARG, URLS
 
 User = get_user_model()
 
