@@ -1,52 +1,40 @@
 from django.contrib.auth import get_user_model
-from django.test import TestCase
-from django.urls import reverse
 
-from notes.models import Note
+from notes.forms import NoteForm
+from notes.tests.basefixture import URLS, BaseTest
 
 User = get_user_model()
 
 
-class TestHomePage(TestCase):
-    HOME_URL = reverse('notes:home')
-
-    @classmethod
-    def setUpTestData(cls):
-        cls.reader = User.objects.create(username='reader')
-        cls.author = User.objects.create(username='author')
-
-        cls.note = Note.objects.create(
-            title='title', text='text', slug='title', author=cls.author
+class TestHomePage(BaseTest):
+    def test_auth_client_has_add_button(self):
+        response = self.reader_client.get(URLS['home_url'])
+        self.assertIn(
+            'href="/add/"', response.content.decode(encoding='utf-8')
         )
 
-    def test_auth_client_has_add_button(self):
-        self.client.force_login(self.reader)
-        response = self.client.get(self.HOME_URL)
-        self.assertIn('href="/add/"', str(response.content))
-
     def test_anon_client_has_no_add_button(self):
-        response = self.client.get(self.HOME_URL)
-        self.assertNotIn('href="/add/"', str(response.content))
+        response = self.client.get(URLS['home_url'])
+        self.assertNotIn(
+            'href="/add/"', response.content.decode(encoding='utf-8')
+        )
 
     def test_notes_list_for_different_users(self):
         names = (
-            (self.author, True),
-            (self.reader, False),
+            (self.author_client, True),
+            (self.reader_client, False),
         )
-        for user, note_in_list in names:
-            self.client.force_login(user)
-            url = reverse('notes:list')
-            response = self.client.get(url)
+        for client, note_in_list in names:
+            response = client.get(URLS['list_url'])
             object_list = response.context['object_list']
-            self.assertEqual(self.note in object_list, note_in_list)
+            self.assertIs(self.note in object_list, note_in_list)
 
     def test_pages_contains_form(self):
-        names = (
-            ('notes:add', None),
-            ('notes:edit', (self.note.slug,)),
+        urls = (
+            URLS['add_url'],
+            URLS['edit_url'],
         )
-        self.client.force_login(self.author)
-        for name, args in names:
-            url = reverse(name, args=args)
-            response = self.client.get(url)
+        for url in urls:
+            response = self.author_client.get(url)
             self.assertIn('form', response.context)
+            self.assertIsInstance(response.context['form'], NoteForm)

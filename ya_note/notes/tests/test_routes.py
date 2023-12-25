@@ -1,27 +1,13 @@
 from http import HTTPStatus
 
 from django.contrib.auth import get_user_model
-from django.test import Client, TestCase
 
-from notes.models import Note
-from notes.tests.basefixture import SLUG_ARG, URLS
+from notes.tests.basefixture import URLS, BaseTest
 
 User = get_user_model()
 
 
-class TestRoutes(TestCase):
-    @classmethod
-    def setUpTestData(cls):
-        cls.author = User.objects.create(username='author')
-        cls.reader = User.objects.create(username='reader')
-        cls.author_client = Client()
-        cls.author_client.force_login(cls.author)
-        cls.reader_client = Client()
-        cls.reader_client.force_login(cls.reader)
-        cls.note = Note.objects.create(
-            title='title', text='text', slug=SLUG_ARG[0], author=cls.author
-        )
-
+class TestRoutes(BaseTest):
     def test_pages_availabiliy(self):
         urls_clients_statuses = (
             # выглядит как-то криво, но что-то лучше придумать не вышло
