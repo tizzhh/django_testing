@@ -19,11 +19,31 @@ URLS = {name: pytest.lazy_fixture(name) for name in FIXTURE_NAMES}
 @pytest.mark.parametrize(
     'url, parametrized_client, expected_status',
     (
-        (URLS['home_url'], pytest.lazy_fixture('client'), HTTPStatus.OK),
-        (URLS['detail_url'], pytest.lazy_fixture('client'), HTTPStatus.OK),
-        (URLS['login_url'], pytest.lazy_fixture('client'), HTTPStatus.OK),
-        (URLS['logout_url'], pytest.lazy_fixture('client'), HTTPStatus.OK),
-        (URLS['signup_url'], pytest.lazy_fixture('client'), HTTPStatus.OK),
+        (
+            URLS['home_url'],
+            pytest.lazy_fixture('client'),
+            HTTPStatus.OK,
+        ),
+        (
+            URLS['detail_url'],
+            pytest.lazy_fixture('client'),
+            HTTPStatus.OK,
+        ),
+        (
+            URLS['login_url'],
+            pytest.lazy_fixture('client'),
+            HTTPStatus.OK,
+        ),
+        (
+            URLS['logout_url'],
+            pytest.lazy_fixture('client'),
+            HTTPStatus.OK,
+        ),
+        (
+            URLS['signup_url'],
+            pytest.lazy_fixture('client'),
+            HTTPStatus.OK,
+        ),
         (
             URLS['edit_url'],
             pytest.lazy_fixture('author_client'),

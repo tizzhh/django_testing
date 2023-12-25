@@ -6,7 +6,10 @@ from django.test import Client
 from django.urls import reverse
 from django.utils import timezone
 
+from news.forms import BAD_WORDS
 from news.models import Comment, News
+
+NUMBER_OF_COMMENTS = 10
 
 
 @pytest.fixture
@@ -69,7 +72,7 @@ def comment(news, author):
 @pytest.fixture
 def comment_list(news, author):
     now = timezone.now()
-    for i in range(settings.NEWS_COUNT_ON_HOME_PAGE + 1):
+    for i in range(NUMBER_OF_COMMENTS):
         comment = Comment.objects.create(
             news=news,
             author=author,
@@ -85,7 +88,7 @@ def home_url():
 
 
 @pytest.fixture
-def detail_url(news, comment):
+def detail_url(news):
     return reverse('news:detail', args=(news.pk,))
 
 
@@ -115,20 +118,10 @@ def signup_url():
 
 
 @pytest.fixture
-def news_id(news):
-    return (news.pk,)
-
-
-@pytest.fixture
-def news_with_comment_id(news, comment):
-    return (news.pk,)
-
-
-@pytest.fixture
-def comment_id(comment):
-    return (comment.pk,)
-
-
-@pytest.fixture
 def comment_form_data():
     return {'text': 'new comment text'}
+
+
+@pytest.fixture
+def bad_words_data():
+    return {'text': f'Какой-то текст, {BAD_WORDS[0]}, еще текст'}
